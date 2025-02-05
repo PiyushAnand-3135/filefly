@@ -1,11 +1,22 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import fileFlyLogo from './assets/filefly_logo.png';
 import quitIcon from './assets/quit-icon.png';
 import FileInfo from './components/FileInfo';
+import DeviceOverlay from './components/DeviceOverlay';
 
 const App = () => {
   const fileInputRef = useRef(null);
   const [files, setFiles] = useState([]);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [devices, setDevices] = useState([]); // Stores discovered devices
+
+  // Simulate device discovery (this is just a placeholder for actual WebRTC discovery)
+  useEffect(() => {
+    if (showOverlay) {
+      // Simulate device discovery (this would be done with WebRTC signaling)
+      setDevices(['Device 1', 'Device 2', 'Device 3']);
+    }
+  }, [showOverlay]);
 
   const handleFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
@@ -25,9 +36,16 @@ const App = () => {
   const handleDeleteFile = (fileName) => {
     setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
   };
-  
 
-  return ( 
+  const handleShareClick = () => {
+    setShowOverlay(true); // Show overlay when "Share" button is clicked
+  };
+
+  const handleCloseOverlay = () => {
+    setShowOverlay(false); // Close overlay
+  };
+
+  return (
     <div className="flex flex-col gap-7 m-3 p-3">
       {/* Header Section */}
       <div className="flex justify-between items-center">
@@ -57,8 +75,26 @@ const App = () => {
         />
       </div>
 
-      {/* Pass the selected files to FileInfo and enable deletion */}
-      <FileInfo files={files} onDeleteFile = {handleDeleteFile}/>
+      {/* Share Button */}
+      <div>
+        <button
+          onClick={handleShareClick}
+          className="bg-green-400 rounded-md p-2 shadow-lg hover:bg-green-500 cursor-pointer focus:outline-none"
+        >
+          Share
+        </button>
+      </div>
+
+      {/* File Info Section */}
+      <FileInfo files={files} onDeleteFile={handleDeleteFile} />
+
+      {/* Device Discovery Overlay */}
+      {showOverlay && (
+        <DeviceOverlay
+          devices={devices}
+          onCloseOverlay={handleCloseOverlay}
+        />
+      )}
     </div>
   );
 };
